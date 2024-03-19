@@ -22,7 +22,7 @@ psi0 = Qobj([[1],[1],[0]]) / np.sqrt(2)  # 初态为0，+1的两能级+x态
 
 
 # 定义时间点
-tlist = np.linspace(0, 10 ** (-3), 100000) # 这里时间的增加要达到ns量级
+tlist = np.linspace(0, 10 ** (-3), 1000000) # 这里时间的增加要达到ns量级
 
 
 # 定义Lindblad算符
@@ -39,11 +39,10 @@ result = mesolve(H, psi0, tlist, L, [])
 
 # 施加旋波half-pi脉冲，并计算0态概率
 Pulse_Ope = []
-Proj = basis(3,1) * basis(3,1).dag()
 for n in range(len(tlist)):
     Ope = ((-1j * H * tlist[n]).expm()) * (HalfPi_Sy10.expm()) * ((+1j * H * tlist[n]).expm())
-    state = Ope * result.states[n] * Ope.dag()
-    Pulse_Ope.append((state * Proj).tr())
+    state = Ope * result.states[n]
+    Pulse_Ope.append(fidelity(basis(3,1),state))
                
 
 # 绘制0能级占据概率随时间的变化
