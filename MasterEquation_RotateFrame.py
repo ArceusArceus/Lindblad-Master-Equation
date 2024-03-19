@@ -1,3 +1,4 @@
+#请注意：这个程序是在旋转坐标系中进行计算的
 import numpy as np
 import matplotlib.pyplot as plt
 from qutip import *
@@ -7,7 +8,7 @@ levels = 3  # 能级数
 S = (levels-1)/2  # 自旋
 gamma = np.array([[0,98,130],[98,0,100],[130,100,0]])  # 退极化率
 
-# 定义哈密顿量
+# 定义哈密顿量，旋转坐标系下Lindblad方程不含H，所以设为零
 H = qzero(levels)
 
 Sy10 = Qobj([[0,-1j * 0.5,0],[1j * 0.5,0,0],[0,0,1]]) # 0，+1的两能级Sy
@@ -35,7 +36,7 @@ for j in range(levels):
 result = mesolve(H, psi0, tlist, L, [])
 
 
-# 施加旋波half-pi脉冲，并计算0态概率
+# 施加half-pi脉冲，并计算0态概率
 Coherence = []
 Proj = basis(3,1) * basis(3,1).dag()
 for n in range(len(tlist)):
