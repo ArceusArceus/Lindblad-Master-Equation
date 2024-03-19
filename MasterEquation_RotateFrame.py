@@ -8,12 +8,10 @@ S = (levels-1)/2  # 自旋
 gamma = np.array([[0,98,130],[98,0,100],[130,100,0]])  # 退极化率
 
 # 定义哈密顿量
-D = 2 * np.pi * 2.87 * (10**6) # 零场劈裂
-Field = 510 * 2.8 * (10**3) # 沿轴磁场510 Gauss
-H = D * (jmat(S,'z') * jmat(S,'z') - 1/3) + (Field * jmat(S,'z')) 
+H = qzero(levels)
 
 Sy10 = Qobj([[0,-1j * 0.5,0],[1j * 0.5,0,0],[0,0,1]]) # 0，+1的两能级Sy
-HalfPi_Sy10 = -1j * 0.5 * np.pi * Sy10 # Sy的pi/2脉冲
+HalfPi_Sy10 = (-1j * 0.5 * np.pi * Sy10).expm() # Sy的pi/2脉冲
 
 
 
@@ -22,7 +20,7 @@ psi0 = Qobj([[1],[1],[0]]) / np.sqrt(2)  # 初态为0，+1的两能级+x态
 
 
 # 定义时间点
-tlist = np.linspace(0, 10 ** (-3), 100000) # 这里时间的增加要达到ns量级
+tlist = np.linspace(0, 10 ** (-3), 10000) # 这里时间的增加要达到ns量级
 
 
 # 定义Lindblad算符
@@ -38,17 +36,18 @@ result = mesolve(H, psi0, tlist, L, [])
 
 
 # 施加旋波half-pi脉冲，并计算0态概率
-Pulse_Ope = []
+Coherence = []
 Proj = basis(3,1) * basis(3,1).dag()
 for n in range(len(tlist)):
-    Ope = ((-1j * H * tlist[n]).expm()) * (HalfPi_Sy10.expm()) * ((+1j * H * tlist[n]).expm())
-    state = Ope * result.states[n] * Ope.dag()
-    Pulse_Ope.append((state * Proj).tr())
+    density = result.states[n]
+    density_Rot = HalfPi_Sy10 * density * HalfPi_Sy10.dag()
+    Coherence.append((density_Rot * Proj).tr())
+
                
 
 # 绘制0能级占据概率随时间的变化
 plt.figure(figsize=(8, 5))
-plt.plot(tlist, Pulse_Ope, label=f"Level")
+plt.plot(tlist, Coherence, label=f"Level")
 plt.xlabel('Time')
 plt.ylabel('Population')
 plt.legend()
