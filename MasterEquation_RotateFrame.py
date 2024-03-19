@@ -20,7 +20,7 @@ psi0 = Qobj([[1],[1],[0]]) / np.sqrt(2)  # 初态为0，+1的两能级+x态
 
 
 # 定义时间点
-tlist = np.linspace(0, 10 ** (-3), 10000) # 这里时间的增加要达到ns量级
+tlist = np.linspace(0, 10 ** (-3), 10000) 
 
 
 # 定义Lindblad算符
